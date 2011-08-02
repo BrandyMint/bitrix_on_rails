@@ -16,5 +16,3 @@ require 'bitrix_on_rails/iblock_element_prop_s'
 require 'bitrix_on_rails/iblock_element_prop_m'
 
 ActiveRecord::Base.extend BitrixOnRails::ActiveRecord
-
-puts 'aaa'
