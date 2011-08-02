@@ -1,0 +1,1 @@
+mysqldump -u root kamin_icf1 b_iblock > dump.sql

@@ -17,7 +17,7 @@ module BitrixOnRails
           element_class.instance_eval(&blk)
         end
 
-        self.const_set(element_class_name, element_class)
+        Kernel.const_set(element_class_name, element_class)
       end
 
       has_one :iblock_element, :through => prop_s_name, :class_name => element_class_name, :autosave => true
