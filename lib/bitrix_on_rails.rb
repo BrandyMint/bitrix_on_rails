@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-# require 'rails'
-
 module BitrixOnRails
+  def self.init
+    # Это здесь для того чтобы при перезагрузке в development
+    # режиме заново создавались ассоциации iblock_element_prop_s3
+    # TODO переделать на более элегантное решение
+    Iblock.all.map &:init_property_models
+    # IblockProperty.cache_all
+  end
 end
 
 require 'active_record'
-
+require 'bitrix_on_rails/engine'
 require 'bitrix_on_rails/active_record'
 require 'bitrix_on_rails/iblock_element_prop_s'
 require 'bitrix_on_rails/iblock_element_prop_m'
-# require 'bitrix_on_rails/engine'
-
-# ActiveRecord::Base.connection.tables
 
 ActiveRecord::Base.extend BitrixOnRails::ActiveRecord
 
-# Просто подгружаем модель, тогда в ней появятся ассоциации типа iblock_element_prop_s3
-IblockElement.class
-
-# IblockProperty.cache_all
+puts 'aaa'

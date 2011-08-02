@@ -100,9 +100,3 @@ class IblockElement < ActiveRecord::Base
   end
 
 end
-
-
-# Это здесь для того чтобы при перезагрузке в development
-# режиме заново создавались ассоциации iblock_element_prop_s3
-# TODO переделать на более элегантное решение
-Iblock.all.map &:init_property_models
