@@ -1,0 +1,86 @@
+= bitrix_on_rails
+
+Приблуды для использования под рельсами базы 1С:Битрикс.
+
+Для каждого инфоблока что лежит в b_iblock есть своя таблица название которой с номером инфоблока, например b_iblock_element_prop_s7
+prop_s - для одиночных свойтсв, prop_m - для множестенный.
+У каждого инфоблока нескоолько секций (iblock_section), в каждой секции несколько элементов (iblock_element) у каждого элемента разные свойства которые лежат в prop_s/_m.
+Соответсвенно я эти свойства вытащил в одно место - они все доступны из модели IblockElement. Или напрямую; IblockElement.find(123).НАЗВАНИЕ_СВОЙСТВА или через метод properties
+
+== Что есть:
+
+=== mysql2_downcase адаптер
+1. Адаптер mysql2_downcase для автоматической конвертации заглавных наименований полей в прописные.
+
+=== Инфоблоки
+
+1. Все модели для таблиц b_iblock_*
+2. Автоматическая установка свойств из таблиц prop_s*/prop_m* в методы объекта IblockElement.
+   Например IblockElement.find(1).name_emittents, где name_emittent - свойство из prop_s.
+   Все подобные свойства также доступны через метод IblockElement#properties.
+
+3. IblockElementS*
+ 1. Тоже самое и для моделей IblockElementPropertyS*, плюс в них значения полей можно еще и устанавливать:
+
+   p = IblockElementPropertyS3.find(1)
+   p.name_emittents='новое имя'
+   p.save
+
+ 2. Поиск по кодовым названиям полей таблицы
+
+   IblockElementPropertyS3.find_by_post_id(123)
+
+   вместо
+
+   .find_by_property_149(123)
+
+   Таким образом если мы знаем что инфоблок S3 связан с таблицей постов и хотим получить все свойства поста 63, делаем:
+
+   IblockElementPropS3.find_by_post_id(63).iblock_element.properties
+
+3. IblockElement.properties выдает хеш соответсвия кодов свойств и названия их полей в prop_s
+   Автоматическое определение привязки элемента к объекту. Например: если мы спрашиваем iblock_element.post
+то он ищет ключ :post_id в свойствах элемента, и если находит, то возвращает Post.find_by_id(properties[:post_id])
+
+4. Все свойства IblockProperty кешируются и доступны через find(id)
+
+5. В IblockElement автоматически добавляются has_one :iblock_element_prop_s* и has_many :iblock_element_prop_m* при создании соответвующих классов.
+
+6. Модель можно расширять инфоблоком с помощью:
+
+   class Post << ActiveRecord::Base
+
+     has_infoblock(3, :property_19) # где property_19 поле ссылающееся на Post
+
+   для этой модели автоматически создадутся ассоциации
+
+     :iblock_element - класс PostElement
+
+   Класс PostElement будет иметь ассоциации
+
+    :property_set (он же iblock_element_prop_sNUMBER) и
+    :m_prop_values
+
+    а также default_scope с номером инфоблока, поэтому PostElement.all выдаст только элементы к специфичному инфоблоку
+
+
+=== Битрикс-авторизация
+
+== mysql2_downcase
+
+Подключать просто:
+
+    development:
+      adapter: mysql2_downcase
+      encoding: cp1251
+      ...
+
+== Contributing to bitrix_on_rails
+
+* С нетерпением жду форков, пулеквестов, замечаний и предложений.
+
+== Copyright
+
+Copyright (c) 2011 Danil Pismenny. See LICENSE.txt for
+further details.
+
