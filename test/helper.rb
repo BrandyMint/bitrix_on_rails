@@ -34,20 +34,25 @@ ActiveRecord::Base.establish_connection(
 
 require 'schema'
 
-Iblock.create(
-  :id=>3,
-  :name=>'Свойство блога',
-  :timestamp_x=>Time.now,
-  :iblock_type=>IblockType.create,
-  :lid=>'lid')
+Iblock.new do |i|
+  i.id = 3
+  i.version = 2
+  i.name = 'Свойство блога'
+  i.timestamp_x = Time.now
+  i.iblock_type = IblockType.create
+  i.lid = 'lid'
+  i.save
+end
 
-Iblock.create(
-  :id=>7,
-  :name=>'Эмитенты',
-  :timestamp_x=>Time.now,
-  :iblock_type=>IblockType.create,
-  :lid=>'lid')
-
+Iblock.new do |i|
+  i.id = 7
+  i.version = 2
+  i.name = 'Эмитенты'
+  i.timestamp_x = Time.now
+  i.iblock_type = IblockType.create
+  i.lid = 'lid'
+  i.save
+end
 
 class Test::Unit::TestCase
 end

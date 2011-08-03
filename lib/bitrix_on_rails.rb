@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+require 'rails'
+require 'active_record'
+
 module BitrixOnRails
   def self.init
     Iblock.all.map &:init_property_models
