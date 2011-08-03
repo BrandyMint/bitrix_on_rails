@@ -8,7 +8,7 @@ module BitrixOnRails
       has_one prop_s_name, :foreign_key => property_name, :class_name => "::IblockElementPropS#{iblock_id}", :autosave => true
 
       element_class_name = self.name + 'Element'
-      unless self.const_defined?(element_class_name)
+      unless Kernel.const_defined?(element_class_name)
         element_class = Class.new(IblockElement) do
           set_iblock_id iblock_id
         end
@@ -20,7 +20,7 @@ module BitrixOnRails
         Kernel.const_set(element_class_name, element_class)
       end
 
-      has_one :iblock_element, :through => prop_s_name, :class_name => element_class_name, :autosave => true
+      has_one :iblock_element, :through => prop_s_name, :class_name => "::#{element_class_name}", :autosave => true
     end
   end
 end
