@@ -4,7 +4,11 @@ require 'active_record'
 
 module BitrixOnRails
   def self.init
-    Iblock.all.map &:init_property_models
+    # При работе с тестовой базой может случиться ситуация, что база пуста и никакой таблицы b_iblock
+    # там нет, что приведет к ислючению. Проверка сделана для корректной работы Rake задач.
+    if ::ActiveRecord::Base.connection.tables.find{ |t| t == 'b_iblock'}
+      Iblock.all.map &:init_property_models
+    end
   end
 end
 
