@@ -34,12 +34,83 @@ class Iblock < ActiveRecord::Base
     def all
       @cached_all ||= super
     end
+
+    def get_properties(id)
+      @properties = {} unless @properties
+      @properties[id] ||= IblockProperty.where(:iblock_id => id).inject({}) { |a,e| a[e.id] = e; a }
+    end
+
+    def get_property(iblock_id, property_id)
+      get_properties(iblock_id)[property_id]
+    end
+
+    def get_property_codes(id)
+      @property_codes = {} unless @property_codes
+      @property_codes[id] ||= get_properties(id).values.inject({}){ |a,e| a[e.code] = e.id; a }
+    end
+
+    # Определяем методы совпадающие с именами свойств и их установкой, например следующие записи идентичны:
+    #
+    #   post.iblock_element.property_set.name2 = 'имя'
+    #   post.iblock_element.name2 = 'имя'
+    #   post.name2 = 'имя'
+    #   post.property_name2 = 'имя'
+    #
+    # Вызывается для классов наследуемых от IblockElement, типа Emitent и расширяемых
+    # инфоблоком через has_infoblock, например Post
+    #
+    def define_delegated_methods(scope, id, is_class=false)
+      # TODO Проверять не создали ли мы такие методы уже в рамках класса
+      # это так если у класса установлен @iblock_id
+
+      return if scope.is_a?(IblockElement) and scope.class.iblock_id
+
+      eval_method = is_class ? :class_eval : :instance_eval
+
+      get_property_codes(id).each { |code, number|
+
+        if scope.respond_to? code
+          logger.warn "Iblock(#{id}): Метод #{code} уже определен в #{scope.class}"
+        else
+          scope.send eval_method, "def #{code}; property_set.send('#{code}'); end"
+        end
+        scope.send eval_method,  "def property_#{code}; property_set.send('#{code}'); end"
+
+
+        # TODO Сделать .to_i если тип свойства NUMERIC, также для boolean
+        if scope.respond_to? "#{code}="
+          logger.warn "Iblock(#{id}): Метод #{code}= уже определен в #{scope.class}"
+        else
+          scope.send eval_method, "def #{code}=(value); property_set.send('#{code}=', value); end"
+        end
+        scope.send eval_method, "def property_#{code}=(value); property_set.send('#{code}=', value); end"
+
+        # Если мы спрашиваем iblock_element.post
+        # то он ищет ключ :post_id в свойствах элемента
+        # и если находит, то возвращает Post.find_by_id(properties[:post_id])
+        # if code.to_s=~/_id$/
+        #   method = code.to_s.gsub(/_id$/,'')
+        #   if Kernel.const_defined? class_name = code.to_s.humanize
+        #     instance_eval "def #{method}; #{class_name}.find_by_id(self.send :#{code}); end"
+        #   end
+        # end
+      }
+
+    end
+
   end
 
   def to_s
     name
   end
 
+  def get_property(property_id)
+    self.class.get_property(id, property_id)
+  end
+
+  def property_codes
+    self.class.get_property_codes(id)
+  end
 
   def init_property_models
     return unless version==2

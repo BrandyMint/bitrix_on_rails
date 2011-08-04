@@ -74,6 +74,32 @@ prop_s - для одиночных свойтсв, prop_m - для множес�
 
     а также default_scope с номером инфоблока, поэтому Post::Element.all выдаст только элементы к специфичному инфоблоку
 
+== Примерчики:
+
+=== Хеш кодов свойств инфоблока и их идентификаторов
+
+    Iblock.get_property_codes(3)
+    # => {:blog_id=>9, :glob_class=>11, :post_id=>13, :post_cafe=>15, :post_analitik=>16, :post_type=>17, :anonim=>18, :file=>20, :status=>21, :auto_rubric=>37, :link_change=>38, :link_company=>123, :post_kitchen=>124, :analyst=>152, :post_toilet=>193, :theme=>280, :post_analitik_bloger=>290, :num_comments=>309, :cnt_thanks=>327, :preview_mpage=>341, :name2=>342, :cnt_complaint=>349, :pr_subscribe=>410, :was_published=>421, :vip_subscribe=>422, :post_skyline=>430, :vip_send_date=>438}
+
+    # Тоже что и
+    Iblock.find(3).property_codes
+
+=== Кешированный список всех свойств инфоблока хешем с ключом-идентификатором
+
+    Iblock.get_properties(3)
+
+    # Тоже самое
+    Iblock.find(3).get_properties(3)[13]
+    # => #<IblockProperty id: 13, timestamp_x: "2009-12-17 18:13:59", iblock_id: 3, name: "ID Поста", active: "Y", sort: 600, code: "POST_ID", default_value: "", property_type: "N", row_count: 1, col_count: 30, list_type: "L", multiple: "N", xml_id: nil, file_type: "", multiple_cnt: 5, tmp_id: nil, link_iblock_id: 0, with_description: "N", searchable: "N", filtrable: "Y", is_required: "Y", version: 2, user_type: nil, user_type_settings: nil>
+
+=== Конретное свойство
+
+    Iblock.get_property(ibock_id, property_id)
+
+    # Тоже самое
+    Iblock.find(3).get_property(13).code
+    # => :post_id
+
 
 === Битрикс-авторизация
 

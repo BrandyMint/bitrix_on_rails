@@ -8,7 +8,12 @@ class TestBitrixOnRails < Test::Unit::TestCase
     puts IblockElementPropM7
   end
 
-  should "" do
+  should "Брать свойства для блока и кешировать их" do
+
+    Iblock.get_properties(3)
+
+    # А этот запрос уже кеширован
+    Iblock.get_properties(3)
   end
 end
 

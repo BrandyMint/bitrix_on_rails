@@ -14,7 +14,11 @@ module BitrixOnRails
 
       self.const_set('Element', element_class)
 
+      self.class_eval("def property_set; iblock_element.property_set; endь")
+      Iblock.define_delegated_methods(self, iblock_id, true)
+
       has_one :iblock_element, :through => prop_s_name, :class_name => 'Element', :autosave => true
+
     end
   end
 end
