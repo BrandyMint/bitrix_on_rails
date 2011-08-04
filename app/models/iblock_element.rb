@@ -32,8 +32,8 @@ class IblockElement < ActiveRecord::Base
       prop_s_class = "IblockElementPropS#{id}"
       prop_m_class = "IblockElementPropM#{id}"
 
-      has_one :property_set, :class_name => "::#{prop_s_class}", :foreign_key => 'iblock_element_id', :autosave => true
-      has_many :m_prop_values, :class_name => "::#{prop_m_class}", :foreign_key => 'iblock_element_id'
+      has_one :s_prop, :class_name => "::#{prop_s_class}", :foreign_key => 'iblock_element_id', :autosave => true
+      has_many :m_prop_values, :class_name => "::#{prop_m_class}", :foreign_key => 'iblock_element_id', :autosave => true
 
       default_scope where(:iblock_id => id, :active => 'Y')
 
@@ -55,5 +55,9 @@ class IblockElement < ActiveRecord::Base
 
   def to_s
     name
+  end
+
+  def property_set
+    send "iblock_element_prop_s#{iblock_id}"
   end
 end

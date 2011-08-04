@@ -122,25 +122,11 @@ class Iblock < ActiveRecord::Base
     unless Kernel.const_defined? const_name
       e = Class.new(ActiveRecord::Base) do
         extend BitrixOnRails::IblockElementPropS
-
-       class << self
-         @m_prop_class = nil
-         @m_props = nil
-
-         def m_prop_class
-           Kernel.const_get(@m_prop_class)
-         end
-
-         def m_props
-           @m_props
-         end
-       end
-
-       acts_as_iblock_element_prop_s(iblock_id)
-     end
-     Kernel.const_set const_name, e
-   end
-   Kernel.const_get(const_name).init
+        acts_as_iblock_element_prop_s(iblock_id)
+      end
+      Kernel.const_set const_name, e
+    end
+    Kernel.const_get(const_name).init
 
     # Создаем классы IblockElementPropMНОМЕР
    #
