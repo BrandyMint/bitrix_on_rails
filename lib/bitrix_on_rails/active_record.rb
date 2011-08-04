@@ -8,7 +8,7 @@ module BitrixOnRails
       has_one prop_s_name, :foreign_key => property_name, :class_name => "::IblockElementPropS#{iblock_id}", :autosave => true
 
       element_class = Class.new IblockElement do
-        set_iblock_id 3
+        set_iblock_id iblock_id
       end
       element_class.class_eval(&blk) if block_given?
 
