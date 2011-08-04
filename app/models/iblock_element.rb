@@ -29,11 +29,15 @@ class IblockElement < ActiveRecord::Base
     def set_iblock_id(id)
       @iblock_id = id
 
-      prop_s_class = "IblockElementPropS#{id}"
-      prop_m_class = "IblockElementPropM#{id}"
+      hash = {
+        :class_name => Iblock.s_props_class(id).name,
+        :foreign_key => 'iblock_element_id',
+        :autosave => true}
+      has_one :s_prop, hash
+      has_one "iblock_element_prop_s#{iblock_id}".to_sym, hash
 
-      has_one :s_prop, :class_name => "::#{prop_s_class}", :foreign_key => 'iblock_element_id', :autosave => true
-      has_many :m_prop_values, :class_name => "::#{prop_m_class}", :foreign_key => 'iblock_element_id', :autosave => true
+      has_many :m_prop_values, :class_name => Iblock.m_props_class(id),
+               :foreign_key => 'iblock_element_id', :autosave => true
 
       default_scope where(:iblock_id => id, :active => 'Y')
 
@@ -55,6 +59,10 @@ class IblockElement < ActiveRecord::Base
 
   def to_s
     name
+  end
+
+  def multiply_properties
+    send "iblock_element_prop_m#{iblock_id}"
   end
 
   def property_set
