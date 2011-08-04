@@ -21,28 +21,21 @@ module BitrixOnRails::IblockElementPropS
     end
 
     before_save do
-      self.class.m_props.each_value { |p|
-        values = m_prop_values(p.id)
-        self.send("property_#{p.id}=", PHP.serialize({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
+      m_props.each_value { |prop|
+        values = m_prop_values(prop.id)
+        self.send("property_#{prop.id}=", PHP.serialize({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
       }
     end
-
   end
 
-  def create_element_association
-    IblockElement.send :has_one, "iblock_element_prop_s#{id}".to_sym, :class_name=>"::IblockElementPropS#{id}"
-  end
+  # Вроде нигде не используется
+  # def create_element_association
+  #   IblockElement.send :has_one, "iblock_element_prop_s#{id}".to_sym, :class_name=>"::IblockElementPropS#{id}"
+  # end
 
   module ClassMethods
-
-
-    def m_props
-      # @m_prop_class = "IblockElementPropM#{id}"
-      # Название свойства сохраняется только для наглядности, чтобы можно было через консоль понять
-      # что за свойство.
-      @m_props ||= Iblock.get_properties(iblock_id).select { |k,e| e.multiple == 'Y' }
+    class << self
     end
-
     # code - врое как кодовое название свойства
     # name - русское описание
 
@@ -62,17 +55,11 @@ module BitrixOnRails::IblockElementPropS
     #
     #   self.post_id вместо self.property_120
     #
-
-    def iblock_id
-      self.name=~/(\d+)/
-      $1.to_i
-    end
-
     def init
+      self.to_s=~/(\d+)/
+      iblock_id = $1.to_i
 
-      # Вот это не срабатывает для Post::Element
-      #
-      IblockElement.send :has_one, "iblock_element_prop_s#{iblock_id}".to_sym, :class_name=>Iblock.s_props_class(iblock_id).name, :autosave => true
+      IblockElement.send :has_one, "iblock_element_prop_s#{iblock_id}".to_sym, :class_name=>"::IblockElementPropS#{iblock_id}"
 
       self.properties = {}
       attribute_names.select {|a| a[0,4]=='prop' }.each do |name|
@@ -104,11 +91,6 @@ module BitrixOnRails::IblockElementPropS
 
   module InstanceMethods
 
-    def iblock_id
-      self.class.to_s=~/(\d+)/
-      $1.to_i
-    end
-
     # Возвращает десериализованное (при необходимости) значение свойства
     #
     # prop - код свойства (post_id к примеру)
@@ -116,17 +98,21 @@ module BitrixOnRails::IblockElementPropS
       send prop
     end
 
+    def m_props
+      @m_props ||= Iblock.properties(self.iblock_id).select { |k,v| v.multiple == 'Y'}
+    end
+
     def m_prop_values(prop_id)
-      Iblock.m_props_class(iblock_id).where(:iblock_element_id => self.id, :iblock_property_id => prop_id).collect { |e| e.value }
+      Iblock.m_props_class(self.iblock_id).where(:iblock_element_id => self.iblock_element_id, :iblock_property_id => prop_id).collect { |e| e.value }
     end
 
     def create_m_prop_value(prop_id, value)
-      Iblock.m_props_class(iblock_id).create(:iblock_element_id => self.id, :iblock_property_id => prop_id, :value => value)
+      Iblock.m_props_class(self.iblock_id).create(:iblock_element_id => self.iblock_element_id, :iblock_property_id => prop_id, :value => value)
     end
 
     def destroy_m_prop_value(prop_id, value)
-      m_props = Iblock.m_props_class(iblock_id).where(:iblock_element_id => self.iblock_element_id, :iblock_property_id => prop_id, :value => value)
-      m_props.each { |p| p.destroy } if m_props.any?
+      props = Iblock.m_props_class(self.iblock_id).where(:iblock_element_id => self.iblock_element_id, :iblock_property_id => prop_id, :value => value)
+      props.each { |p| p.destroy } if props.any?
     end
   end
 end
