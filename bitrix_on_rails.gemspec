@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bitrix_on_rails}
-  s.version = "0.1.5"
+  s.version = "0.1.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Danil Pismenny"]
-  s.date = %q{2011-08-03}
+  s.date = %q{2011-08-04}
   s.description = %q{Использование инфоблоков 1С-Битрикс в Ruby On Rails проектах}
   s.email = %q{danil@orionet.ru}
   s.extra_rdoc_files = [
