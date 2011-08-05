@@ -3,11 +3,34 @@ require 'rails'
 require 'active_record'
 
 module BitrixOnRails
-  def self.init
-    # При работе с тестовой базой может случиться ситуация, что база пуста и никакой таблицы b_iblock
-    # там нет, что приведет к ислючению. Проверка сделана для корректной работы Rake задач.
+  def self.configure
+    config = Configuration.new
+    yield config
+
     if ::ActiveRecord::Base.connection.tables.include? 'b_iblock'
       Iblock.all.map &:init_property_models
+
+      if config
+        config.infoblocks.each { |infoblock|
+          # IblockElement.define_iblock_class(infoblock[:iblock_id], infoblock[:class_name], infoblock[:options])
+        }
+      end
+    end
+  end
+
+  class Configuration
+    attr_reader :infoblocks
+
+    def initialize
+      @infoblocks = []
+    end
+
+    def infoblock(iblock_id, class_name = nil, options = {})
+      @infoblocks << {
+        :iblock_id  => iblock_id,
+        :class_name => class_name,
+        :options    => options
+      }
     end
   end
 end
