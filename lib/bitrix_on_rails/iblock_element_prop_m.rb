@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 module BitrixOnRails::IblockElementPropM
   def acts_as_iblock_element_prop_m(id)
     extend ClassMethods

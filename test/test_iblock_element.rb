@@ -10,7 +10,7 @@ class IblockElementTest < Test::Unit::TestCase
       end
 
       should 'create class IblockElement3 in global namespace' do
-        assert_not_nil Kernel.const_defined?('IblockElement3')
+        assert_not_nil Object.const_defined?('IblockElement3')
       end
     end
 
@@ -20,13 +20,13 @@ class IblockElementTest < Test::Unit::TestCase
       end
 
       should 'create class PostProperties in global namespace' do
-        assert_not_nil Kernel.const_defined?('PostProperties')
+        assert_not_nil Object.const_defined?('PostProperties')
       end
     end
 
     context 'with class name in non global namespace' do
       setup do
-        Kernel.const_set('Post', Class.new)
+        Object.const_set('Post', Class.new)
         BitrixOnRails.define_iblock_class(3, :class_name => 'Post::Element')
       end
 
@@ -41,8 +41,8 @@ class IblockElementTest < Test::Unit::TestCase
       end
 
       should 'create property classes' do
-        assert_not_nil Kernel.const_defined?('IblockElementPropS3')
-        assert_not_nil Kernel.const_defined?('IblockElementPropM3')
+        assert_not_nil Object.const_defined?('IblockElementPropS3')
+        assert_not_nil Object.const_defined?('IblockElementPropM3')
       end
 
       should 'create associations for property classes in IblockElement' do
@@ -57,7 +57,7 @@ class IblockElementTest < Test::Unit::TestCase
 
     context 'with passed :extended_by' do
       setup do
-        Kernel.const_set('IblockElementExtension', Module.new{ def some_method ; end})
+        Object.const_set('IblockElementExtension', Module.new{ def some_method ; end})
         BitrixOnRails.define_iblock_class(3, :extended_by => 'IblockElementExtension')
       end
 

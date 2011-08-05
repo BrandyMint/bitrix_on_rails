@@ -16,16 +16,16 @@ module BitrixOnRails
       class_name = a.last
 
       namespace = a[0..-2].join('::')
-      namespace = namespace.empty? ? Kernel : Kernel.const_get(namespace)
+      namespace = namespace.empty? ? Object : Object.const_get(namespace)
     else
       class_name = "IblockElement#{iblock_id}"
-      namespace  = Kernel
+      namespace  = Object
     end
-
-    create_prop_classes(iblock_id)
 
     iblock_element_class = create_inherited_class(iblock_id, options[:extended_by])
     namespace.const_set(class_name, iblock_element_class)
+
+    create_prop_classes(iblock_id, iblock_element_class)
 
     # Вставляем связи с i_block_element_prop_* на уровень IblockElement. Это может быть полезно
     # в том случае, если пользователь получил объект класса IblockElement, а не создаваемого.
@@ -52,32 +52,54 @@ module BitrixOnRails
       }
     end
 
-    iblock_element_class.extend Kernel.const_get(extended_by) if extended_by
+    iblock_element_class.extend Object.const_get(extended_by) if extended_by
 
     @@infoblocks[iblock_id] = iblock_element_class
 
     iblock_element_class
   end
 
-  def self.create_prop_classes(iblock_id)
+  def self.create_prop_classes(iblock_id, iblock_element_class)
     const_name = "IblockElementPropS#{iblock_id}"
-    unless Kernel.const_defined? const_name
+    unless Object.const_defined? const_name
       c = Class.new(::ActiveRecord::Base) do
         extend BitrixOnRails::IblockElementPropS
-        acts_as_iblock_element_prop_s(iblock_id)
+
+        class << self
+          # Имя класса, хранящего значения для множественных свойств
+          @m_prop_class = nil
+
+          # Список множественных свойств
+          @m_props = nil
+
+          # Список одиночных свойств
+          @s_props = nil
+
+          def m_prop_class
+            Object.const_get(@m_prop_class)
+          end
+
+          def m_props
+            @m_props
+          end
+
+          def s_props
+            @s_props
+          end
+        end
+
+        acts_as_iblock_element_prop_s(iblock_id, iblock_element_class)
       end
-      Kernel.const_set const_name, c
+      Object.const_set const_name, c
     end
-    # Kernel.const_get(const_name).init
 
     const_name = "IblockElementPropM#{iblock_id}"
-    unless Kernel.const_defined? const_name
+    unless Object.const_defined? const_name
       c = Class.new(::ActiveRecord::Base) do
         extend BitrixOnRails::IblockElementPropM
         acts_as_iblock_element_prop_m(iblock_id)
       end
-      Kernel.const_set "IblockElementPropM#{iblock_id}", c
+      Object.const_set "IblockElementPropM#{iblock_id}", c
     end
-    # Kernel.const_get(const_name).init
   end
 end
