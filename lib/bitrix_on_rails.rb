@@ -10,7 +10,7 @@ module BitrixOnRails
     yield config
 
     config.infoblocks.each { |infoblock|
-      IblockElement.define_iblock_class(infoblock[:iblock_id], infoblock[:class_name], infoblock[:options])
+      BitrixOnRails.define_iblock_class(infoblock[:iblock_id], infoblock[:options])
     }
   end
 end
@@ -18,6 +18,7 @@ end
 require 'bitrix_on_rails/engine'
 require 'bitrix_on_rails/configuration'
 require 'bitrix_on_rails/active_record'
+require 'bitrix_on_rails/iblock_element'
 require 'bitrix_on_rails/iblock_element_prop_s'
 require 'bitrix_on_rails/iblock_element_prop_m'
 

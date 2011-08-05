@@ -6,7 +6,7 @@ class IblockElementTest < Test::Unit::TestCase
 
     context 'with class_name set to nil' do
       setup do
-        IblockElement.define_iblock_class(3)
+        BitrixOnRails.define_iblock_class(3)
       end
 
       should 'create class IblockElement3 in global namespace' do
@@ -16,7 +16,7 @@ class IblockElementTest < Test::Unit::TestCase
 
     context 'with class name in global namespace' do
       setup do
-        IblockElement.define_iblock_class(3, :class_name => 'PostProperties')
+        BitrixOnRails.define_iblock_class(3, :class_name => 'PostProperties')
       end
 
       should 'create class PostProperties in global namespace' do
@@ -27,7 +27,7 @@ class IblockElementTest < Test::Unit::TestCase
     context 'with class name in non global namespace' do
       setup do
         Kernel.const_set('Post', Class.new)
-        IblockElement.define_iblock_class(3, :class_name => 'Post::Element')
+        BitrixOnRails.define_iblock_class(3, :class_name => 'Post::Element')
       end
 
       should 'create class Element in Post namespace' do
@@ -37,7 +37,7 @@ class IblockElementTest < Test::Unit::TestCase
 
     context 'behaviour' do
       setup do
-        IblockElement.define_iblock_class(3)
+        BitrixOnRails.define_iblock_class(3)
       end
 
       should 'create property classes' do
@@ -49,12 +49,16 @@ class IblockElementTest < Test::Unit::TestCase
         assert_not_nil IblockElement.reflections[:iblock_element_prop_s3]
         assert_not_nil IblockElement.reflections[:iblock_element_prop_m3]
       end
+
+      should 'add class information in BitrixOnRails.infoblocks' do
+        assert_equal IblockElement3, BitrixOnRails.infoblocks[3]
+      end
     end
 
     context 'with passed :extended_by' do
       setup do
         Kernel.const_set('IblockElementExtension', Module.new{ def some_method ; end})
-        IblockElement.define_iblock_class(3, :extended_by => 'IblockElementExtension')
+        BitrixOnRails.define_iblock_class(3, :extended_by => 'IblockElementExtension')
       end
 
       should 'extend created class with given module' do

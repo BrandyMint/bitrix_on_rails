@@ -6,10 +6,9 @@ module BitrixOnRails
       @infoblocks = []
     end
 
-    def infoblock(iblock_id, class_name = nil, options = {})
+    def infoblock(iblock_id, options = {})
       @infoblocks << {
         :iblock_id  => iblock_id,
-        :class_name => class_name,
         :options    => options
       }
     end

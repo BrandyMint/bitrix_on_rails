@@ -484,4 +484,8 @@ ActiveRecord::Schema.define(:version => 20110725170841) do
     t.string "element_name",   :limit => 100, :null => false
   end
 
+  create_table "posts" do |t|
+    t.string "title"
+  end
+
 end
