@@ -34,6 +34,7 @@ GEM
     columnize (0.3.4)
     erubis (2.6.6)
       abstract (>= 1.0.0)
+    factory_girl (2.0.2)
     git (1.2.5)
     growl (1.0.3)
     guard (0.5.1)
@@ -106,6 +107,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.0.0)
+  factory_girl
   growl
   guard-test
   jeweler (~> 1.6.4)

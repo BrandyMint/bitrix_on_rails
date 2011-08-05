@@ -6,6 +6,7 @@ guard 'test' do
   watch(%r{^test/.+_test\.rb$})
   watch(%r{^test/test_.+\.rb$})
   watch('test/helper.rb')  { "test" }
+  watch('test/factories.rb')  { "test" }
 
   # Rails example
   watch(%r{^app/models/(.+)\.rb$})                   { |m| "test/unit/#{m[1]}_test.rb" }
