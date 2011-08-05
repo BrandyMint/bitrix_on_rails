@@ -9,8 +9,8 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended to check this file into your version control system.
-
 ActiveRecord::Schema.define(:version => 20110725170841) do
+  @@verbose = false
   create_table "b_blog_post", :force => true do |t|
     t.string   "title",                                                :null => false
     t.integer  "blog_id",                                              :null => false

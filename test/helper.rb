@@ -9,6 +9,7 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
+require 'ruby-debug'
 require 'active_record'
 require 'factory_girl'
 require 'shoulda'
