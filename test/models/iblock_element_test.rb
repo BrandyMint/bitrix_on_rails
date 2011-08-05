@@ -16,7 +16,7 @@ class IblockElementTest < Test::Unit::TestCase
 
     context 'with class name in global namespace' do
       setup do
-        IblockElement.define_iblock_class(3, 'PostProperties')
+        IblockElement.define_iblock_class(3, :class_name => 'PostProperties')
       end
 
       should 'create class PostProperties in global namespace' do
@@ -27,7 +27,7 @@ class IblockElementTest < Test::Unit::TestCase
     context 'with class name in non global namespace' do
       setup do
         Kernel.const_set('Post', Class.new)
-        IblockElement.define_iblock_class(3, 'Post::Element')
+        IblockElement.define_iblock_class(3, :class_name => 'Post::Element')
       end
 
       should 'create class Element in Post namespace' do
@@ -48,6 +48,18 @@ class IblockElementTest < Test::Unit::TestCase
       should 'create associations for property classes in IblockElement' do
         assert_not_nil IblockElement.reflections[:iblock_element_prop_s3]
         assert_not_nil IblockElement.reflections[:iblock_element_prop_m3]
+      end
+    end
+
+    context 'with passed :extended_by' do
+      setup do
+        Kernel.const_set('IblockElementExtension', Module.new{ def some_method ; end})
+        IblockElement.define_iblock_class(3, :extended_by => 'IblockElementExtension')
+      end
+
+      should 'extend created class with given module' do
+        # Не нашел другого способа проверить, что модуль был включен в класс
+        assert IblockElement3.methods.include?(:some_method)
       end
     end
 

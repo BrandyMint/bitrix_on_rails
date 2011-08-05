@@ -13,7 +13,6 @@ require 'ruby-debug'
 require 'active_record'
 require 'factory_girl'
 require 'shoulda'
-require 'ruby-debug'
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
