@@ -38,6 +38,24 @@ class IblockElement < ActiveRecord::Base
   default_scope where(:active => 'Y')
 
   def self.define_iblock_class(iblock_id, class_name = nil , options = {})
+    # Определяем имя класса, который нужно создать, а также namespace, в котором
+    # его нужно создать.
+    if class_name
+      a = class_name.split('::')
+
+      class_name = a.last
+
+      namespace = a[0..-2].join('::')
+      namespace = namespace.empty? ? Kernel : Kernel.const_get(namespace)
+    else
+      class_name = "IblockElement#{iblock_id}"
+      namespace  = Kernel
+    end
+
+    return if namespace.const_defined?(class_name)
+
+    create_prop_classes(iblock_id)
+
     iblock_element_class = Class.new(IblockElement) do
       @iblock_id = iblock_id
       @iblock_properties = Iblock.get_property_codes(iblock_id)
@@ -57,26 +75,37 @@ class IblockElement < ActiveRecord::Base
       }
     end
 
-    # Определяем имя класса, который нужно создать, а также namespace, в котором
-    # его нужно создать.
-    if class_name
-      a = class_name.split('::')
-      class_name = a.last
-      namespace  = a[0..-2].join('::')
-    else
-      class_name = "IblockElement#{iblock_id}"
-      namespace  = Kernel
-    end
-
-    Kernel.const_set(class_name, iblock_element_class)
+    namespace.const_set(class_name, iblock_element_class)
 
     # Вставляем связи с i_block_element_prop_* на уровень IblockElement. Это может быть полезно
     # в том случае, если пользователь получил объект класса IblockElement, а не того создаваемого.
     # Использование этих связей полностью в компетенции пользователя объекта.
-    class IblockElement
-      has_one  "iblock_element_prop_s#{iblock_id}"
-      has_many "iblock_element_prop_m#{iblock_id}"
+    self.instance_eval do
+      has_one  "iblock_element_prop_s#{iblock_id}".to_sym
+      has_many "iblock_element_prop_m#{iblock_id}".to_sym
     end
+  end
+
+  def self.create_prop_classes(iblock_id)
+    const_name = "IblockElementPropS#{iblock_id}"
+    unless Kernel.const_defined? const_name
+      c = Class.new(ActiveRecord::Base) do
+        extend BitrixOnRails::IblockElementPropS
+        acts_as_iblock_element_prop_s(iblock_id)
+      end
+      Kernel.const_set const_name, c
+    end
+    # Kernel.const_get(const_name).init
+
+    const_name = "IblockElementPropM#{iblock_id}"
+    unless Kernel.const_defined? const_name
+      c = Class.new(ActiveRecord::Base) do
+        extend BitrixOnRails::IblockElementPropM
+        acts_as_iblock_element_prop_m(iblock_id)
+      end
+      Kernel.const_set "IblockElementPropM#{iblock_id}", c
+    end
+    # Kernel.const_get(const_name).init
   end
 
   def property_codes

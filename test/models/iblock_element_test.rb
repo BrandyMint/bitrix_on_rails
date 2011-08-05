@@ -10,7 +10,7 @@ class IblockElementTest < Test::Unit::TestCase
       end
 
       should 'create class IblockElement3 in global namespace' do
-        assert_not_nil Kernel.const_get('IblockElement3')
+        assert_not_nil Kernel.const_defined?('IblockElement3')
       end
     end
 
@@ -20,18 +20,34 @@ class IblockElementTest < Test::Unit::TestCase
       end
 
       should 'create class PostProperties in global namespace' do
-        assert_not_nil Kernel.const_get('PostProperties')
+        assert_not_nil Kernel.const_defined?('PostProperties')
       end
     end
 
     context 'with class name in non global namespace' do
       setup do
-        class Post ; end
+        Kernel.const_set('Post', Class.new)
         IblockElement.define_iblock_class(3, 'Post::Element')
       end
 
       should 'create class Element in Post namespace' do
-        assert_not_nil Post.const_get('Element')
+        assert_not_nil Post.const_defined?('Element')
+      end
+    end
+
+    context 'behaviour' do
+      setup do
+        IblockElement.define_iblock_class(3)
+      end
+
+      should 'create property classes' do
+        assert_not_nil Kernel.const_defined?('IblockElementPropS3')
+        assert_not_nil Kernel.const_defined?('IblockElementPropM3')
+      end
+
+      should 'create associations for property classes in IblockElement' do
+        assert_not_nil IblockElement.reflections[:iblock_element_prop_s3]
+        assert_not_nil IblockElement.reflections[:iblock_element_prop_m3]
       end
     end
 

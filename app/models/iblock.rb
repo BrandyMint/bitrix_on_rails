@@ -100,31 +100,4 @@ class Iblock < ActiveRecord::Base
   def property_codes
     self.class.get_property_codes(id)
   end
-
-  def init_property_models
-    return unless version == 2
-    iblock_id = self.id
-
-    # Создаем классы IblockElementPropSНОМЕР
-    const_name = "IblockElementPropS#{iblock_id}"
-    unless Kernel.const_defined? const_name
-      e = Class.new(ActiveRecord::Base) do
-        extend BitrixOnRails::IblockElementPropS
-        acts_as_iblock_element_prop_s(iblock_id)
-      end
-      Kernel.const_set const_name, e
-    end
-    Kernel.const_get(const_name).init
-
-    # Создаем классы IblockElementPropMНОМЕР
-    const_name = "IblockElementPropM#{iblock_id}"
-    unless Kernel.const_defined? const_name
-      e = Class.new(ActiveRecord::Base) do
-        extend BitrixOnRails::IblockElementPropM
-        acts_as_iblock_element_prop_m(iblock_id)
-      end
-      Kernel.const_set "IblockElementPropM#{iblock_id}", e
-    end
-    Kernel.const_get(const_name).init
-  end
 end

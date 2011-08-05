@@ -10,7 +10,6 @@ module BitrixOnRails
     yield config
 
     config.infoblocks.each { |infoblock|
-      Iblock.all.map &:init_property_models
       IblockElement.define_iblock_class(infoblock[:iblock_id], infoblock[:class_name], infoblock[:options])
     }
   end
