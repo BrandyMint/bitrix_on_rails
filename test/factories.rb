@@ -68,6 +68,7 @@ FactoryGirl.define do
     code 'PREVIEW_MPAGE'
     property_type 'S'
     multiple 'N'
+    user_type 'HTML'
   end
 
   factory :iblock3_m_prop_glob_clas, :parent => :iblock_property do

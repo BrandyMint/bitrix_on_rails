@@ -44,9 +44,9 @@ module BitrixOnRails::IblockElementPropS
 
     Iblock.get_properties(iblock_id).select { |k,e|
       if e.multiple == 'Y'
-        @m_props[e.code] = {:id => e.id, :type => e.property_type}
+        @m_props[e.code] = {:id => e.id, :type => e.property_type, :user_type => e.user_type}
       else
-        @s_props[e.code] = {:id => e.id, :type => e.property_type}
+        @s_props[e.code] = {:id => e.id, :type => e.property_type, :user_type => e.user_type}
       end
     }
 
@@ -57,15 +57,15 @@ module BitrixOnRails::IblockElementPropS
     @s_props.each { |code, property|
       define_method(code) do
         value = send "property_#{property[:id]}"
-        unserialize value, property[:type]
+        unserialize value, property[:type], property[:user_type]
       end
 
       define_method("#{code}=") do |val|
-        send"property_#{property[:id]}", serialize(val, property[:type])
+        send "property_#{property[:id]}=", serialize(val, property[:type], property[:user_type])
       end
 
       define_method "find_by_#{code}" do |val|
-        send "find_by_property#{property[:id]}", serialize(val, property[:type])
+        send "find_by_property#{property[:id]}", serialize(val, property[:type], property[:user_type])
       end
     }
 
@@ -99,7 +99,7 @@ module BitrixOnRails::IblockElementPropS
     # * L - список
     # * E - привязка к элементам
     # * G - привязка к группам.
-    def unserialize(value, type)
+    def unserialize(value, type, user_type = nil)
       case type
         when 'N'
           value.is_a?(BigDecimal) ? value.to_i : value
@@ -117,8 +117,19 @@ module BitrixOnRails::IblockElementPropS
       end
     end
 
-    def serialize(value, type)
-      value
+    def serialize(value, type, user_type = nil)
+      case type
+      when 'S'
+        if user_type == 'HTML'
+          ::PHP.serialize({'TEXT' => value, 'TYPE' => 'html'})
+        else
+          # Это делается потому, что пользователь может хранить в строках не только
+          # строковые значения, например, Datetime.
+          value.to_s
+        end
+      else
+        value
+      end
     end
   end
 end
