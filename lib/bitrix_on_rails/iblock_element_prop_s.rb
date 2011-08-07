@@ -1,5 +1,39 @@
 # -*- coding: utf-8 -*-
 module BitrixOnRails::IblockElementPropS
+
+  class MPropValuesWrapper
+    attr_reader :iblock_element_id, :iblock_property_id
+
+    def initialize(iblock_element_id, iblock_property_id, m_prop_class)
+      @iblock_element_id = iblock_element_id
+      @iblock_property_id = iblock_property_id
+
+      @m_prop_class = m_prop_class
+    end
+
+    def values
+      @m_prop_class.where(
+        :iblock_element_id => @iblock_element_id,
+        :iblock_property_id => @iblock_property_id
+      ).collect { |e| e.value }
+    end
+
+    def add(value)
+      @m_prop_class.create(
+        :iblock_element_id => @iblock_element_id,
+        :iblock_property_id => @iblock_property_id,
+        :value => value)
+    end
+
+    def remove(value)
+      m_props = @m_prop_class.where(
+        :iblock_element_id => @iblock_element_id,
+        :iblock_property_id => @iblock_property_id,
+        :value => value)
+      m_props.each { |p| p.destroy } if m_props.any?
+    end
+  end
+
   def acts_as_iblock_element_prop_s(iblock_id, iblock_element_class)
     extend ClassMethods
     include InstanceMethods
@@ -35,10 +69,17 @@ module BitrixOnRails::IblockElementPropS
       end
     }
 
+    @m_props.each { |code, property|
+      define_method(code) do
+        instance_variable_get("@m_prop_#{property[:id]}".to_sym) ||
+        instance_variable_set("@m_prop_#{property[:id]}".to_sym, MPropValuesWrapper.new(self.iblock_element_id, property[:id], m_prop_class))
+      end
+    }
+
     before_save do
-      self.class.m_props.each_value { |p|
-        values = m_prop_values(p.id)
-        self.send("property_#{p.id}=", PHP.serialize({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
+      self.class.m_props.each { |code, p|
+        values = send(code).values
+        self.send("property_#{p[:id]}=", ::PHP.serialize({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
       }
     end
   end
@@ -47,23 +88,8 @@ module BitrixOnRails::IblockElementPropS
   end
 
   module InstanceMethods
-    # Возвращает десериализованное (при необходимости) значение свойства
-    # prop - код свойства (post_id к примеру)
-    def get_value(prop)
-      send prop
-    end
-
-    def m_prop_values(prop_id)
-      Iblock.m_props_class(iblock_id).where(:iblock_element_id => self.id, :iblock_property_id => prop_id).collect { |e| e.value }
-    end
-
-    def create_m_prop_value(prop_id, value)
-      Iblock.m_props_class(iblock_id).create(:iblock_element_id => self.id, :iblock_property_id => prop_id, :value => value)
-    end
-
-    def destroy_m_prop_value(prop_id, value)
-      m_props = Iblock.m_props_class(iblock_id).where(:iblock_element_id => self.iblock_element_id, :iblock_property_id => prop_id, :value => value)
-      m_props.each { |p| p.destroy } if m_props.any?
+    def m_prop_class
+      self.class.m_prop_class
     end
 
     # Возможные значения для типов свойств:
@@ -79,7 +105,7 @@ module BitrixOnRails::IblockElementPropS
           value.is_a?(BigDecimal) ? value.to_i : value
         when 'S'
           if value.length > 5 && value[0..3] =~ /[a-z]:\d/
-            v = PHP.unserialize(value)
+            v = ::PHP.unserialize(value)
             v.is_a?(Hash) && v.include?('TEXT') ? v['TEXT'] : value
           else
             value

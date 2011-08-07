@@ -13,13 +13,13 @@ require 'ruby-debug'
 require 'active_record'
 require 'factory_girl'
 require 'shoulda'
+require 'active_support/test_case'
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
   :database => ":memory:"
   )
 require 'schema'
-
 
 # require 'test/unit'
 # require "test/unit/notify"
@@ -39,6 +39,7 @@ require 'factories'
 
 class Test::Unit::TestCase
   include Factory::Syntax::Methods
+  include ActiveSupport::Testing::Assertions
 
   def bitrix_configure
     BitrixOnRails.configure do

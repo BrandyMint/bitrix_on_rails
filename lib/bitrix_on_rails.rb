@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'rails'
 require 'active_record'
+require 'php_serialize'
 
 module BitrixOnRails
   def self.configure
