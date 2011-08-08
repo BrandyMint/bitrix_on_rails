@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 require 'rails'
 require 'active_record'
+require 'php_serialize'
 
 module BitrixOnRails
-  def self.init
-    # При работе с тестовой базой может случиться ситуация, что база пуста и никакой таблицы b_iblock
-    # там нет, что приведет к ислючению. Проверка сделана для корректной работы Rake задач.
-    if ::ActiveRecord::Base.connection.tables.include? 'b_iblock'
-      Iblock.all.map &:init_property_models
-    end
+  def self.configure
+    return unless ::ActiveRecord::Base.connection.tables.include? 'b_iblock'
+
+    config = Configuration.new
+    yield config
+
+    config.infoblocks.each { |infoblock|
+      BitrixOnRails.define_iblock_class(infoblock[:iblock_id], infoblock[:options])
+    }
   end
 end
 
 require 'bitrix_on_rails/engine'
+require 'bitrix_on_rails/configuration'
 require 'bitrix_on_rails/active_record'
+require 'bitrix_on_rails/iblock_element'
 require 'bitrix_on_rails/iblock_element_prop_s'
 require 'bitrix_on_rails/iblock_element_prop_m'
 

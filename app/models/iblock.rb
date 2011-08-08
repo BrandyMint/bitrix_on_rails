@@ -84,21 +84,10 @@ class Iblock < ActiveRecord::Base
           scope.send eval_method, "def #{code}=(value); property_set.send('#{code}=', value); end"
         end
         scope.send eval_method, "def property_#{code}=(value); property_set.send('#{code}=', value); end"
-
-        # Если мы спрашиваем iblock_element.post
-        # то он ищет ключ :post_id в свойствах элемента
-        # и если находит, то возвращает Post.find_by_id(properties[:post_id])
-        # if code.to_s=~/_id$/
-        #   method = code.to_s.gsub(/_id$/,'')
-        #   if Kernel.const_defined? class_name = code.to_s.humanize
-        #     instance_eval "def #{method}; #{class_name}.find_by_id(self.send :#{code}); end"
-        #   end
-        # end
       }
 
     end
-
-  end
+  end # self
 
   def to_s
     name
@@ -111,34 +100,4 @@ class Iblock < ActiveRecord::Base
   def property_codes
     self.class.get_property_codes(id)
   end
-
-  def init_property_models
-    return unless version==2
-    iblock_id = self.id
-
-    # Создаем классы IblockElementPropSНОМЕР
-    #
-    const_name = "IblockElementPropS#{iblock_id}"
-    unless Kernel.const_defined? const_name
-      e = Class.new(ActiveRecord::Base) do
-        extend BitrixOnRails::IblockElementPropS
-        acts_as_iblock_element_prop_s(iblock_id)
-      end
-      Kernel.const_set const_name, e
-    end
-    Kernel.const_get(const_name).init
-
-    # Создаем классы IblockElementPropMНОМЕР
-   #
-   const_name = "IblockElementPropM#{iblock_id}"
-   unless Kernel.const_defined? const_name
-     e = Class.new(ActiveRecord::Base) do
-       extend BitrixOnRails::IblockElementPropM
-       acts_as_iblock_element_prop_m(iblock_id)
-     end
-     Kernel.const_set "IblockElementPropM#{iblock_id}", e
-   end
-   Kernel.const_get(const_name).init
-  end
-
 end

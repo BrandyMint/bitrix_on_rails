@@ -3,22 +3,23 @@
 module BitrixOnRails
   module ActiveRecord
 
-    def has_infoblock(iblock_id, property_name, &blk)
+    # TODO: Добавить еще один параметр delegated_methods, через который пользователь сможет определить
+    # методы, которые необходимо проделегировать в iblock_element
+    def has_infoblock(iblock_id, foreign_key)
       prop_s_name = "iblock_element_prop_s#{iblock_id}".to_sym
-      has_one prop_s_name, :foreign_key => property_name, :class_name => "::IblockElementPropS#{iblock_id}", :autosave => true
+      iblock_element_class = BitrixOnRails.infoblocks[iblock_id]
 
-      element_class = Class.new IblockElement do
-        set_iblock_id iblock_id
-      end
-      element_class.class_eval(&blk) if block_given?
+      has_one prop_s_name, :class_name => "::IblockElementPropS#{iblock_id}", :foreign_key => foreign_key , :autosave => true
+      has_one :iblock_element, :class_name => iblock_element_class.name, :through => prop_s_name
 
-      self.const_set('Element', element_class)
-
-      self.class_eval("def property_set; iblock_element.property_set; end")
-      Iblock.define_delegated_methods(self, iblock_id, true)
-
-      has_one :iblock_element, :through => prop_s_name, :class_name => 'Element', :autosave => true
-
+      iblock_element_class.iblock_properties.each { |m, property|
+        # Во избежание коллизий не стоит делегировать методы вроде post_id, blog_id дальше
+        unless m.to_s =~ /_id$/
+          delegate m, :to => :iblock_element
+          delegate "#{m}=", :to => :iblock_element unless property[:multiple]
+        end
+      }
     end
+
   end
 end

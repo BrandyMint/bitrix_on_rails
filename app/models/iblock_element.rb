@@ -1,11 +1,30 @@
 # -*- coding: utf-8 -*-
 class IblockElement < ActiveRecord::Base
+
+  class << self
+    # Хранит id инфоблока, с которым связан класс. Устанавливается для классов
+    # наследуемых от IblockElement.
+    @iblock_id = nil
+
+    # Хранит хеш свойств, хранящихся в IblockElementPropS*. Устанавливается для
+    # классов наследуемых от IblockElement.
+    @iblock_properties = nil
+
+    def iblock_id
+      @iblock_id
+    end
+
+    def iblock_properties
+      @iblock_properties
+    end
+  end
+
   set_table_name :b_iblock_element
 
   belongs_to :iblock
   belongs_to :iblock_section
 
-  after_find { Iblock.define_delegated_methods(self, self.iblock_id) }
+  # after_find { Iblock.define_delegated_methods(self, self.iblock_id) }
 
   # Применяется только для iblock-ов 1-й версии
   #
@@ -16,42 +35,7 @@ class IblockElement < ActiveRecord::Base
   has_many :iblock_section_elements
   has_many :iblock_sections, :through => :iblock_section_elements
 
-  class << self
-    def iblock_id
-      @iblock_id
-    end
-
-    def property_codes
-      raise "Не установлен @iblock_id" unless iblock_id
-      Iblock.get_property_codes(iblock_id)
-    end
-
-    def set_iblock_id(id)
-      @iblock_id = id
-
-      hash = {
-        :class_name => Iblock.s_props_class(id).name,
-        :foreign_key => 'iblock_element_id',
-        :autosave => true}
-      has_one :s_prop, hash
-      has_one "iblock_element_prop_s#{iblock_id}".to_sym, hash
-
-      has_many :m_prop_values, :class_name => Iblock.m_props_class(id),
-               :foreign_key => 'iblock_element_id', :autosave => true
-
-      default_scope where(:iblock_id => id, :active => 'Y')
-
-      property_codes.each { |code, number|
-        define_method(code) do
-          property_set.send(code)
-        end
-
-        define_method("#{code}=") do |value|
-          property_set.send("#{code}=", value)
-        end
-      }
-    end
-  end
+  default_scope where(:active => 'Y')
 
   def property_codes
     ::Iblock.get_property_codes(self.iblock_id)
@@ -59,13 +43,5 @@ class IblockElement < ActiveRecord::Base
 
   def to_s
     name
-  end
-
-  def multiply_properties
-    send "iblock_element_prop_m#{iblock_id}"
-  end
-
-  def property_set
-    send "iblock_element_prop_s#{iblock_id}"
   end
 end
