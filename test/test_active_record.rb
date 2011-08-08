@@ -23,9 +23,13 @@ class ActiveRecordTest < Test::Unit::TestCase
 
     should 'delegate property methods to iblock_element' do
       post = Post.new
-      [:post_id, :preview_mpage, :glob_class].each { |m|
+      [:preview_mpage, :glob_class, :preview_mpage=].each { |m|
         assert_respond_to post, m
       }
+    end
+
+    should 'not delegete multiple property assignment methods to iblock_element' do
+      assert_not_respond_to Post, :glob_class=
     end
   end
 end

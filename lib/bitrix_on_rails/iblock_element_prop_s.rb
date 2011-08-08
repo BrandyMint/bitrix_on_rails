@@ -100,6 +100,8 @@ module BitrixOnRails::IblockElementPropS
     # * E - привязка к элементам
     # * G - привязка к группам.
     def unserialize(value, type, user_type = nil)
+      return nil unless value
+
       case type
         when 'N'
           value.is_a?(BigDecimal) ? value.to_i : value

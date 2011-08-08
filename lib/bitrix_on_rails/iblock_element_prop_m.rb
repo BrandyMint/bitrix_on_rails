@@ -4,51 +4,26 @@ module BitrixOnRails::IblockElementPropM
     extend ClassMethods
     include InstanceMethods
 
-    # Убираем лишнюю s вконце
-    #set_table_name 'b_'+table_name.chop
     set_table_name "b_iblock_element_prop_m#{id}"
-
-    # delegate :code, :to=>:property
 
     belongs_to :iblock_element
     belongs_to :iblock_property
   end
 
   module ClassMethods
-    def init
-      self.to_s=~/(\d+)/
-      iblock_id = $1.to_i
-      IblockElement.send :has_many, "iblock_element_prop_m#{iblock_id}".to_sym, :class_name=>"::IblockElementPropM#{iblock_id}"
-    end
   end
 
   module InstanceMethods
-
     def property
       # Достаем кешированный вариант
       IblockProperty.find(iblock_property_id)
     end
 
     def code
-      @code||=property.code
-    end
-
-    def get_value
-      case property.property_type
-      when 'S'     # String
-        self.value
-      when 'N'     # Numeric
-        self.value_num.to_i  # Когда BigDecimal - не приятно
-        # when 'E'     # Enum?
-        # self.value_enum
-        # when 'L'     # WTF?
-      else
-        raise "Не установленный тип (#{iblock_property.property_type}) свойства (#{self.class} #{id})"
-      end
+      @code ||= property.code
     end
   end
 end
-
 
 # Table b_iblock_element_prop_m7
 # ==============================
