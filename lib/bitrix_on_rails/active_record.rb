@@ -10,6 +10,13 @@ module BitrixOnRails
       iblock_element_class = BitrixOnRails.infoblocks[iblock_id]
 
       has_one prop_s_name, :class_name => "::IblockElementPropS#{iblock_id}", :foreign_key => foreign_key , :autosave => true
+      full_class_name = self.name
+      class_name = full_class_name.split('::').last.underscore.to_sym
+
+      Object.const_get("IblockElementPropS#{iblock_id}").instance_eval {
+        belongs_to class_name, :class_name => full_class_name, :foreign_key => foreign_key
+      }
+
       has_one :iblock_element, :class_name => iblock_element_class.name, :through => prop_s_name
 
       iblock_element_class.iblock_properties.each { |m, property|

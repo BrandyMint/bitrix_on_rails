@@ -40,6 +40,11 @@ class IblockElementTest < Test::Unit::TestCase
         BitrixOnRails.define_iblock_class(3)
       end
 
+      should 'create association with property classes' do
+        assert_not_nil IblockElement3.reflections[:property_set]
+        assert_not_nil IblockElement3.reflections[:m_props]
+      end
+
       should 'create property classes' do
         assert_not_nil Object.const_defined?('IblockElementPropS3')
         assert_not_nil Object.const_defined?('IblockElementPropM3')

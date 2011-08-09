@@ -19,6 +19,7 @@ class ActiveRecordTest < Test::Unit::TestCase
     should 'create associations' do
       assert Post.reflections.include?("iblock_element_prop_s#{@iblock.id}".to_sym)
       assert Post.reflections.include?(:iblock_element)
+      assert Object.const_get("IblockElementPropS#{@iblock.id}").reflections.include?(:post)
     end
 
     should 'delegate property methods to iblock_element' do

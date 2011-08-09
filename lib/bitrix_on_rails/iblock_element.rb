@@ -41,6 +41,7 @@ module BitrixOnRails
       @iblock_properties = Iblock.get_properties(iblock_id).inject({}){ |a,e| a[e[1].code] = {:id => e[1].id, :multiple => e[1].multiple == 'Y'}; a}
 
       has_one :property_set, :class_name => "IblockElementPropS#{iblock_id}", :foreign_key => 'iblock_element_id', :autosave => true
+      has_many :m_props, :class_name => "IblockElementPropM#{iblock_id}", :foreign_key => 'iblock_element_id', :readonly => true
 
       default_scope where(:iblock_id => iblock_id)
 
