@@ -21,7 +21,7 @@ module BitrixOnRails
 
       iblock_element_class.iblock_properties.each { |m, property|
         # Во избежание коллизий не стоит делегировать методы вроде post_id, blog_id дальше
-        unless m.to_s =~ /_id$/
+        unless m.to_s =~ /_id$/ || self.columns.find{ |c| c.name == m.to_s}
           delegate m, :to => :iblock_element
           delegate "#{m}=", :to => :iblock_element unless property[:multiple]
         end
