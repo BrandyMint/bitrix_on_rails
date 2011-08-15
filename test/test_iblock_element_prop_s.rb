@@ -100,5 +100,12 @@ class IblockElementPropSTest < Test::Unit::TestCase
       assert_equal 'a:2:{s:4:"TEXT";s:30:"BitrixOnRails is awesome, bro!";s:4:"TYPE";s:4:"html";}',
                    @iblock_element_prop_s.send("property_#{@s_prop_class.s_props[:preview_mpage][:id]}")
     end
+
+    should 'convert value into specially formatted string if user_type is DateTime' do
+      t = Time.parse '15 Aug 2011 16:32:18'
+      @iblock_element_prop_s.publication_date = t
+      assert_equal '2011-08-15 16:32:18',
+                   @iblock_element_prop_s.send("property_#{@s_prop_class.s_props[:publication_date][:id]}")
+    end
   end
 end

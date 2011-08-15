@@ -109,6 +109,8 @@ module BitrixOnRails::IblockElementPropS
           if value.length > 5 && value[0..3] =~ /[a-z]:\d/
             v = ::PHP.unserialize(value)
             v.is_a?(Hash) && v.include?('TEXT') ? v['TEXT'] : value
+          elsif user_type == 'DateTime'
+            Time.parse(value)
           else
             value
           end
@@ -124,9 +126,11 @@ module BitrixOnRails::IblockElementPropS
       when 'S'
         if user_type == 'HTML'
           ::PHP.serialize({'TEXT' => value, 'TYPE' => 'html'})
+        elsif user_type == 'DateTime'
+          value.strftime('%Y-%m-%d %H:%M:%S')
         else
           # Это делается потому, что пользователь может хранить в строках не только
-          # строковые значения, например, Datetime.
+          # строковые значения.
           value.to_s
         end
       else

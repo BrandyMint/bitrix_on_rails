@@ -28,6 +28,7 @@ FactoryGirl.define do
     after_build { |iblock|
       iblock.iblock_properties.build  Factory.build(:iblock3_s_prop_post_id).attributes
       iblock.iblock_properties.build  Factory.build(:iblock3_s_prop_preview_mpage).attributes
+      iblock.iblock_properties.build  Factory.build(:iblock3_s_prop_publication_date).attributes
       iblock.iblock_properties.build  Factory.build(:iblock3_m_prop_glob_clas).attributes
     }
 
@@ -69,6 +70,14 @@ FactoryGirl.define do
     property_type 'S'
     multiple 'N'
     user_type 'HTML'
+  end
+
+  factory :iblock3_s_prop_publication_date, :parent => :iblock_property do
+    name 'Дата публикации'
+    code 'PUBLICATION_DATE'
+    property_type 'S'
+    multiple 'N'
+    user_type 'DateTime'
   end
 
   factory :iblock3_m_prop_glob_clas, :parent => :iblock_property do
