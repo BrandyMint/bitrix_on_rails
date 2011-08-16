@@ -110,7 +110,7 @@ module BitrixOnRails::IblockElementPropS
             v = ::PHP.unserialize(value)
             v.is_a?(Hash) && v.include?('TEXT') ? v['TEXT'] : value
           elsif user_type == 'DateTime'
-            Time.parse(value)
+            Time.parse(value).in_time_zone
           else
             value
           end
