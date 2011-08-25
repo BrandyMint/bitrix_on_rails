@@ -2,6 +2,11 @@ require 'helper'
 
 class IblockElementTest < Test::Unit::TestCase
 
+  def setup
+    stub(iblock = Object.new).version { 2 }
+    stub(Iblock).find { iblock }
+  end
+
   context 'define_iblock_class' do
 
     context 'with class_name set to nil' do
@@ -9,8 +14,12 @@ class IblockElementTest < Test::Unit::TestCase
         BitrixOnRails.define_iblock_class(3)
       end
 
+      teardown do
+        Object.send :remove_const, "IblockElement3"
+      end
+
       should 'create class IblockElement3 in global namespace' do
-        assert_not_nil Object.const_defined?('IblockElement3')
+        assert_not_nil Object.const_defined?("IblockElement3")
       end
     end
 
@@ -40,6 +49,10 @@ class IblockElementTest < Test::Unit::TestCase
         BitrixOnRails.define_iblock_class(3)
       end
 
+      teardown do
+        Object.send :remove_const, "IblockElement3"
+      end
+
       should 'create association with property classes' do
         assert_not_nil IblockElement3.reflections[:property_set]
         assert_not_nil IblockElement3.reflections[:m_props]
@@ -64,6 +77,10 @@ class IblockElementTest < Test::Unit::TestCase
       setup do
         Object.const_set('IblockElementExtension', Module.new{ def some_method ; end})
         BitrixOnRails.define_iblock_class(3, :extended_by => 'IblockElementExtension')
+      end
+
+      teardown do
+        Object.send :remove_const, "IblockElement3"
       end
 
       should 'extend created class with given module' do

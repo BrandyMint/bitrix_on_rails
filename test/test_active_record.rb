@@ -16,6 +16,10 @@ class ActiveRecordTest < Test::Unit::TestCase
       end
     end
 
+    teardown do
+      Object.send :remove_const, "IblockElement#{@iblock.id}"
+    end
+
     should 'create associations' do
       assert Post.reflections.include?("iblock_element_prop_s#{@iblock.id}".to_sym)
       assert Post.reflections.include?(:iblock_element)

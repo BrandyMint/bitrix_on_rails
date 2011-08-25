@@ -9,19 +9,19 @@ class IblockElementPropSTest < Test::Unit::TestCase
    ]
 
   def create_iblock(iblock_factory, iblock_element_factory, prop_s_values = [], prop_m_values = [])
-    iblock = Factory.create(iblock_factory)
+    @iblock = Factory.create(iblock_factory)
 
-    BitrixOnRails.define_iblock_class(iblock.id)
+    BitrixOnRails.define_iblock_class(@iblock.id)
 
-    @s_prop_class = Object.const_get("IblockElementPropS#{iblock.id}")
-    @m_prop_class = Object.const_get("IblockElementPropM#{iblock.id}")
+    @s_prop_class = Object.const_get("IblockElementPropS#{@iblock.id}")
+    @m_prop_class = Object.const_get("IblockElementPropM#{@iblock.id}")
 
     properties = @s_prop_class.columns.collect { |c| c.name }
 
-    @iblock_element = Factory.create(iblock_element_factory, :iblock => iblock)
+    @iblock_element = Factory.create(iblock_element_factory, :iblock => @iblock)
 
     prop_m_values.each { |v|
-      @m_prop_class.create(:iblock_element_id => @iblock_element.id, :iblock_property_id => iblock.iblock_properties.last.id, :value => v)
+      @m_prop_class.create(:iblock_element_id => @iblock_element.id, :iblock_property_id => @iblock.iblock_properties.last.id, :value => v)
     }
 
     prop_s_values = [@iblock_element.id] + prop_s_values
@@ -35,6 +35,10 @@ class IblockElementPropSTest < Test::Unit::TestCase
       BitrixOnRails.define_iblock_class(@iblock.id)
 
       @s_prop_class = Object.const_get("IblockElementPropS#{@iblock.id}")
+    end
+
+    teardown do
+      Object.send :remove_const, "IblockElement#{@iblock.id}"
     end
 
     should 'set table name to b_iblock_element_prop_s#{id}' do
@@ -62,6 +66,10 @@ class IblockElementPropSTest < Test::Unit::TestCase
       create_iblock :iblock3, :iblock_element3, PROP_S_VALUES, [144, 1394860, 35, 6, 165]
     end
 
+    teardown do
+      Object.send :remove_const, "IblockElement#{@iblock.id}"
+    end
+
     should 'return unserialized values' do
       assert_equal 11286, @iblock_element_prop_s.post_id
       assert_equal 'Полемика по повышению.', @iblock_element_prop_s.preview_mpage
@@ -75,6 +83,10 @@ class IblockElementPropSTest < Test::Unit::TestCase
   context 'MPropValuesWrapper' do
     setup do
       create_iblock :iblock3, :iblock_element3, PROP_S_VALUES, [10]
+    end
+
+    teardown do
+      Object.send :remove_const, "IblockElement#{@iblock.id}"
     end
 
     should 'add new record to b_iblock_element_prop_m on add' do
