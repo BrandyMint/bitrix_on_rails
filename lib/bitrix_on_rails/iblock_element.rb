@@ -33,6 +33,8 @@ module BitrixOnRails
     # Порядок вызова важен, так как только в этот момент у iblock_element_class появляется имя, которое
     # используется в IblockElementPropS.
     create_prop_classes(iblock_id, iblock_element_class) if iblock_version == 2
+
+    iblock_element_class
   end
 
   protected

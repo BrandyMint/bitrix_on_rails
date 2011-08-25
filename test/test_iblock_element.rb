@@ -2,12 +2,11 @@ require 'helper'
 
 class IblockElementTest < Test::Unit::TestCase
 
-  def setup
-    stub(iblock = Object.new).version { 2 }
-    stub(Iblock).find { iblock }
-  end
-
   context 'define_iblock_class' do
+    setup do
+      stub(iblock = Object.new).version { 2 }
+      stub(Iblock).find { iblock }
+    end
 
     context 'with class_name set to nil' do
       setup do
@@ -89,6 +88,22 @@ class IblockElementTest < Test::Unit::TestCase
       end
     end
 
+  end
+
+  context 'described by iblock with version == 1' do
+    setup do
+      @iblock = Factory.create(:iblock_v1)
+      @iblock_element_class = BitrixOnRails.define_iblock_class(@iblock.id)
+    end
+
+    should 'set multiple association for prop_values' do
+      assert_not_nil @iblock_element_class.reflections[:prop_values]
+    end
+
+    should 'define access methods for iblock properties' do
+      assert @iblock_element_class.instance_methods.include?(:synonym)
+      assert @iblock_element_class.instance_methods.include?(:synonym=)
+    end
   end
 
 end
