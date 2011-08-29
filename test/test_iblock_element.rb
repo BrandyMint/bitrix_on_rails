@@ -3,14 +3,22 @@ require 'helper'
 class IblockElementTest < Test::Unit::TestCase
 
   context 'define_iblock_class' do
+    setup do
+      stub(iblock = Object.new).version { 2 }
+      stub(Iblock).find { iblock }
+    end
 
     context 'with class_name set to nil' do
       setup do
         BitrixOnRails.define_iblock_class(3)
       end
 
+      teardown do
+        Object.send :remove_const, "IblockElement3"
+      end
+
       should 'create class IblockElement3 in global namespace' do
-        assert_not_nil Object.const_defined?('IblockElement3')
+        assert_not_nil Object.const_defined?("IblockElement3")
       end
     end
 
@@ -40,6 +48,10 @@ class IblockElementTest < Test::Unit::TestCase
         BitrixOnRails.define_iblock_class(3)
       end
 
+      teardown do
+        Object.send :remove_const, "IblockElement3"
+      end
+
       should 'create association with property classes' do
         assert_not_nil IblockElement3.reflections[:property_set]
         assert_not_nil IblockElement3.reflections[:m_props]
@@ -66,12 +78,32 @@ class IblockElementTest < Test::Unit::TestCase
         BitrixOnRails.define_iblock_class(3, :extended_by => 'IblockElementExtension')
       end
 
+      teardown do
+        Object.send :remove_const, "IblockElement3"
+      end
+
       should 'extend created class with given module' do
         # Не нашел другого способа проверить, что модуль был включен в класс
         assert IblockElement3.methods.include?(:some_method)
       end
     end
 
+  end
+
+  context 'described by iblock with version == 1' do
+    setup do
+      @iblock = Factory.create(:iblock_v1)
+      @iblock_element_class = BitrixOnRails.define_iblock_class(@iblock.id)
+    end
+
+    should 'set multiple association for prop_values' do
+      assert_not_nil @iblock_element_class.reflections[:prop_values]
+    end
+
+    should 'define access methods for iblock properties' do
+      assert @iblock_element_class.instance_methods.include?(:synonym)
+      assert @iblock_element_class.instance_methods.include?(:synonym=)
+    end
   end
 
 end

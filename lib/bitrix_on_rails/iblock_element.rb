@@ -8,7 +8,9 @@ module BitrixOnRails
   end
 
   def self.define_iblock_class(iblock_id, options = {})
-    iblock_element_class = create_iblock_class(iblock_id, options[:extended_class], options[:extended_by])
+    iblock_version = Iblock.find(iblock_id).version
+
+    iblock_element_class = send("create_iblock_v#{iblock_version}_class", iblock_id, options[:extended_class], options[:extended_by])
 
     unless options[:extended_class]
       # Определяем имя класса, который нужно создать, а также namespace, в котором
@@ -28,27 +30,53 @@ module BitrixOnRails
       namespace.const_set(class_name, iblock_element_class)
     end
 
-    create_prop_classes(iblock_id, iblock_element_class)
+    # Порядок вызова важен, так как только в этот момент у iblock_element_class появляется имя, которое
+    # используется в IblockElementPropS.
+    create_prop_classes(iblock_id, iblock_element_class) if iblock_version == 2
+
+    iblock_element_class
   end
 
   protected
 
-  def self.create_iblock_class(iblock_id, extended_class = nil, extended_by = nil)
+  def self.create_iblock_v1_class(iblock_id, extended_class = nil, extended_by = nil)
+    create_iblock_class(iblock_id, extended_class, extended_by) do
+      has_many :prop_values, :class_name => 'IblockElementProperty', :foreign_key => 'iblock_element_id'
+
+      @iblock_properties.each { |m, property|
+        define_method m do
+          prop_values.where(:iblock_property_id => property[:id]).first.try(:value)
+        end
+
+        define_method "#{m}=" do |value|
+          prop_values.create(:iblock_property_id => property[:id], :value => value)
+        end
+      }
+    end
+  end
+
+  def self.create_iblock_v2_class(iblock_id, extended_class = nil, extended_by = nil)
+    create_iblock_class(iblock_id, extended_class, extended_by) do
+      has_one :property_set, :class_name => "IblockElementPropS#{iblock_id}", :foreign_key => 'iblock_element_id', :autosave => true
+      has_many :m_props, :class_name => "IblockElementPropM#{iblock_id}", :foreign_key => 'iblock_element_id', :readonly => true
+
+      @iblock_properties.each { |m, property|
+        delegate m, :to => :property_set
+        delegate "#{m}=", :to => :property_set unless property[:multiple]
+      }
+    end
+  end
+
+  def self.create_iblock_class(iblock_id, extended_class = nil, extended_by = nil, &blk)
     iblock_element_class = extended_class || Class.new(::IblockElement) {}
 
     iblock_element_class.instance_eval do
       @iblock_id = iblock_id
       @iblock_properties = Iblock.get_properties(iblock_id).inject({}){ |a,e| a[e[1].code] = {:id => e[1].id, :multiple => e[1].multiple == 'Y'}; a}
 
-      has_one :property_set, :class_name => "IblockElementPropS#{iblock_id}", :foreign_key => 'iblock_element_id', :autosave => true
-      has_many :m_props, :class_name => "IblockElementPropM#{iblock_id}", :foreign_key => 'iblock_element_id', :readonly => true
+      instance_eval(&blk)
 
       default_scope where(:iblock_id => iblock_id)
-
-      @iblock_properties.each { |m, property|
-        delegate m, :to => :property_set
-        delegate "#{m}=", :to => :property_set unless property[:multiple]
-      }
     end
 
     iblock_element_class.extend Object.const_get(extended_by) if extended_by

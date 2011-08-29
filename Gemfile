@@ -25,5 +25,5 @@ group :development, :test do
   gem "guard-test"
   # http://test-unit.rubyforge.org/
   # gem 'test-unit-notify'
-  gem 'test-unit-rr'
+  gem 'rr'
 end

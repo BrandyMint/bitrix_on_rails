@@ -102,4 +102,22 @@ FactoryGirl.define do
   factory :iblock_element7, :parent => :iblock_element do
     association :iblock, :factory=>:iblock7
   end
+
+  #
+  # Инфоблок с version = 1
+  #
+  factory :iblock_v1, :parent => :iblock do
+    version 1
+
+    after_build { |iblock|
+      iblock.iblock_properties.build Factory.build(:iblock_v1_prop_synonym).attributes
+    }
+  end
+
+  factory :iblock_v1_prop_synonym, :parent => :iblock_property do
+    name 'Синоним'
+    code 'synonym'
+    property_type 'S'
+    multiple 'N'
+  end
 end

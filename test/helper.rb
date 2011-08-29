@@ -14,6 +14,7 @@ require 'active_record'
 require 'factory_girl'
 require 'shoulda'
 require 'active_support/test_case'
+require 'rr'
 
 ActiveRecord::Base.establish_connection(
   :adapter => 'sqlite3',
@@ -40,12 +41,5 @@ require 'factories'
 class Test::Unit::TestCase
   include Factory::Syntax::Methods
   include ActiveSupport::Testing::Assertions
-
-  def bitrix_configure
-    BitrixOnRails.configure do
-      infoblock 3, IblockElement3
-      infoblock 7, IblockElement7
-    end
-  end
-
+  include RR::Adapters::TestUnit
 end
