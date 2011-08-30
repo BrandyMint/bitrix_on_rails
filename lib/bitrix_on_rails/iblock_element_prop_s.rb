@@ -79,7 +79,7 @@ module BitrixOnRails::IblockElementPropS
     before_save do
       self.class.m_props.each { |code, p|
         values = send(code).values
-        self.send("property_#{p[:id]}=", ::PHP.serialize({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
+        self.send("property_#{p[:id]}=", ::PHP.serialize_encoded({'VALUE' => values, 'DESCRIPTION' => Array.new(values.size, nil)}))
       }
     end
   end
@@ -107,7 +107,7 @@ module BitrixOnRails::IblockElementPropS
           value.is_a?(BigDecimal) ? value.to_i : value
         when 'S'
           if value.length > 5 && value[0..3] =~ /[a-z]:\d/
-            v = ::PHP.unserialize(value)
+            v = ::PHP.unserialize_encoded(value)
             v.is_a?(Hash) && v.include?('TEXT') ? v['TEXT'] : value
           elsif user_type == 'DateTime'
             Time.parse(value).in_time_zone
@@ -125,7 +125,7 @@ module BitrixOnRails::IblockElementPropS
       case type
       when 'S'
         if user_type == 'HTML'
-          ::PHP.serialize({'TEXT' => value, 'TYPE' => 'html'})
+          ::PHP.serialize_encoded({'TEXT' => value, 'TYPE' => 'html'})
         elsif user_type == 'DateTime'
           value.strftime('%Y-%m-%d %H:%M:%S')
         else

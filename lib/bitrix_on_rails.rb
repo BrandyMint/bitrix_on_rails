@@ -22,5 +22,6 @@ require 'bitrix_on_rails/active_record'
 require 'bitrix_on_rails/iblock_element'
 require 'bitrix_on_rails/iblock_element_prop_s'
 require 'bitrix_on_rails/iblock_element_prop_m'
+require 'php_serialize_encoded'
 
 ActiveRecord::Base.extend BitrixOnRails::ActiveRecord
