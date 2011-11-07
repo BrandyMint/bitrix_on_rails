@@ -15,15 +15,12 @@ module PHP
         val[k] = encode_in_deep(v, encoding)
       end
     elsif val.is_a? String
-
       # Конвертируем длинные бары в длиные тире
       horizontal_bar = "\xE2\x80\x95" # U+2015
       em_dash = "\xE2\x80\x94" # U+2014 &mdash;
 
       val.gsub!(horizontal_bar, em_dash) if val.encoding.name=='UTF-8'
       val.encode!(encoding)
-    else
-      raise "Unknown type: #{val.class}"
     end
     val
   end
