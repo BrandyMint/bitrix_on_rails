@@ -1,5 +1,8 @@
 = bitrix_on_rails
 
+{<img src="http://travis-ci.org/dapi/bitrix_on_rails.png" />}[http://travis-ci.org/dapi/bitrix_on_rails]
+
+
 Приблуды для использования под рельсами базы 1С:Битрикс.
 
 Для каждого инфоблока что лежит в b_iblock есть своя таблица название которой с номером инфоблока, например b_iblock_element_prop_s7
