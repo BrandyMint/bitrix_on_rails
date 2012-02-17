@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class IblockProperty < ActiveRecord::Base
-  set_table_name :b_iblock_property
+  self.table_name = :b_iblock_property
 
   belongs_to :iblock
 

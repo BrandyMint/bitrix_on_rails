@@ -19,7 +19,7 @@ class IblockElement < ActiveRecord::Base
     end
   end
 
-  set_table_name :b_iblock_element
+  self.table_name = :b_iblock_element
 
   belongs_to :iblock
   belongs_to :iblock_section

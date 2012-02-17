@@ -8,7 +8,7 @@ class IblockSection < ActiveRecord::Base
     end
   end
 
-  set_table_name :b_iblock_section
+  self.table_name = :b_iblock_section
 
   belongs_to :iblock
 

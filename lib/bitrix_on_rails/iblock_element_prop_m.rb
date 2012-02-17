@@ -4,7 +4,7 @@ module BitrixOnRails::IblockElementPropM
     extend ClassMethods
     include InstanceMethods
 
-    set_table_name "b_iblock_element_prop_m#{id}"
+    self.table_name = "b_iblock_element_prop_m#{id}"
 
     belongs_to :iblock_element
     belongs_to :iblock_property

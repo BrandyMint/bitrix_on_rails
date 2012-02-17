@@ -50,7 +50,7 @@ module BitrixOnRails::IblockElementPropS
       end
     }
 
-    set_table_name "b_iblock_element_prop_s#{iblock_id}"
+    self.table_name = "b_iblock_element_prop_s#{iblock_id}"
 
     belongs_to :iblock_element, :class_name => iblock_element_class.name
 

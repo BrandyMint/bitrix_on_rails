@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class Iblock < ActiveRecord::Base
-  set_table_name :b_iblock
+  self.table_name = :b_iblock
 
   # version - 1 или 2
 
