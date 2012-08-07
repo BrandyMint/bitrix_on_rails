@@ -4,7 +4,7 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem 'rails', "~> 3.2.2"
-gem 'php_serialize', :git => 'git://github.com/dapi/php_serialize.git'
+gem 'php_serialize'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
