@@ -1,6 +1,6 @@
 = bitrix_on_rails
 
-{<img src="http://travis-ci.org/BrandyMint/bitrix_on_rails.png" />}[http://travis-ci.org/BrandyMint/bitrix_on_rails]
+{<img src="http://travis-ci.org/BrandyMint/bitrix_on_rails.png" />}[http://travis-ci.org/BrandyMint/bitrix_on_rails] [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/BrandyMint/bitrix_on_rails)
 
 
 Приблуды для использования под рельсами базы 1С:Битрикс.
