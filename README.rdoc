@@ -1,6 +1,6 @@
 = bitrix_on_rails
 
-{<img src="http://travis-ci.org/dapi/bitrix_on_rails.png" />}[http://travis-ci.org/dapi/bitrix_on_rails]
+{<img src="http://travis-ci.org/BrandyMint/bitrix_on_rails.png" />}[http://travis-ci.org/BrandyMint/bitrix_on_rails]
 
 
 Приблуды для использования под рельсами базы 1С:Битрикс.
