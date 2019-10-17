@@ -3,7 +3,7 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-gem 'rails', "~> 3.2.2"
+gem 'rails', "~> 3.2.17"
 gem 'php_serialize'
 
 # Add dependencies to develop your gem here.
